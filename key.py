@@ -5,7 +5,7 @@ import sys
 
 KEY_CODE = {
     '1': 10, '2': 11, '3': 12, '4': 13, '5': 14, '6': 15,
-    '7': 16, '8': 17, '9': 18, '0': 19, '-': 20, '=': 21,
+    '7': 16, '8': 17, '9': 18, '0': 19, 'dash': 20, '=': 21,
     'q': 24, 'w': 25, 'e': 26, 'r': 27, 't': 28, 'y': 29,
     'u': 30, 'i': 31, 'o': 32, 'p': 33, '[': 34, ']': 35,
     'a': 38, 's': 39, 'd': 40, 'f': 41, 'g': 42, 'h': 43,
@@ -36,25 +36,49 @@ KEY_CODE = {
 def key_events(argv):
     reg = pyatspi.Registry.generateKeyboardEvent
     if not isinstance(argv, (list, tuple)):
-      argv = [argv]
+        argv = [argv]
     for key_set in argv:
         keys = key_set.split('-')
         print(keys)
-        count = len(keys) - 1
-        reverse_keys = keys[:]
-        reverse_keys.reverse()
-        keys.extend(reverse_keys)
-        keys.pop(count)
-        for index, key_name in enumerate(keys):
-            key = KEY_CODE[key_name]
-            if index < count:
+        if keys[0] == '00':
+            keys.pop(0)
+            for index, key_name in enumerate(keys):
+                if key_name not in KEY_CODE:
+                    print(key_name, "not found")
+                    continue
+                key = KEY_CODE[key_name]
                 event = pyatspi.KEY_PRESS
-            elif index > count:
+                print(key_name, ':', key, event)
+                reg(key, None, event)
+        elif keys[0] == '99':
+            keys.pop(0)
+            for index, key_name in enumerate(keys):
+                if key_name not in KEY_CODE:
+                    print(key_name, "not found")
+                    continue
+                key = KEY_CODE[key_name]
                 event = pyatspi.KEY_RELEASE
-            else:
-                event = pyatspi.KEY_PRESSRELEASE
-            print(key_name, ':', key, event)
-            reg(key, None, event)
+                print(key_name, ':', key, event)
+                reg(key, None, event)
+        else:
+            count = len(keys) - 1
+            reverse_keys = keys[:]
+            reverse_keys.reverse()
+            keys.extend(reverse_keys)
+            keys.pop(count)
+            for index, key_name in enumerate(keys):
+                if key_name not in KEY_CODE:
+                    print(key_name, "not found")
+                    continue
+                key = KEY_CODE[key_name]
+                if index < count:
+                    event = pyatspi.KEY_PRESS
+                elif index > count:
+                    event = pyatspi.KEY_RELEASE
+                else:
+                    event = pyatspi.KEY_PRESSRELEASE
+                print(key_name, ':', key, event)
+                reg(key, None, event)
 
 
 def mouse_event(x, y, event):

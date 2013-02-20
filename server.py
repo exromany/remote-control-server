@@ -1,5 +1,6 @@
 #!/usr/bin/python3.2
 # -*- coding: utf-8 -*-
+# TODO: correct finish on ctrl-D
 import http.server
 import socketserver
 import key
